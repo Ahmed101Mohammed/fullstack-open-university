@@ -46,9 +46,16 @@ const App = () => {
             setTimeout(()=> setMessage([null,null]), 5000)
           }
         )
-        .catch(e=>
+        .catch(error=>
         {
-          setMessage([`Information of ${oldPerson.name} has already been removed from server.`, false])
+          if(error.response)
+          {
+            setMessage([error.response.data.error, false])
+          }
+          else
+          {
+            setMessage([`Information of ${oldPerson.name} has already been removed from server.`, false])
+          }
           setTimeout(()=>setMessage([null,null]), 5000)
         }
         )
@@ -63,6 +70,12 @@ const App = () => {
         setMessage([`Added ${newPerson.name}`,true])
         setTimeout(()=> setMessage([null,null]), 5000)
       })
+      .catch((error)=>
+      {
+        const message = error.response.data.error
+        setMessage([message, false])
+        setTimeout(()=> setMessage([null,null]), 5000)
+      })
     
   }
 
@@ -72,9 +85,9 @@ const App = () => {
       let confirm = window.confirm(`Delete ${person.name}?`)
       if(!confirm) return
       personAPI.deletePerson(id)
-      .then(deletedPerson=>
+      .then(()=>
         {
-            let filteredPersons = persons.filter(person=> person.id !== deletedPerson.id)
+            let filteredPersons = persons.filter(person=> person.id !== id)
             setPersons(filteredPersons)
         }
       )
